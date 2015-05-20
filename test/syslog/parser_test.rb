@@ -133,4 +133,17 @@ class ParserTest < Minitest::Test
     assert_equal params, message.structured_data[0].params
     assert_equal nil, message.msg
   end
+
+  def test_malformed_message
+    parser = Syslog::Parser.new
+
+    line = '<165>1 -10-11T22:14:15.003Z mymachine.example.com evntslog - '\
+      'ID47 [exampleSDID@32473 escape="\"\\\\\]"]'
+
+    error = assert_raises(Syslog::Parser::Error) { parser.parse(line) }
+
+    message = "Failed to match sequence (HEADER SP STRUCTURED_DATA (SP MSG)?) "\
+      "at line 1 char 1."
+    assert_equal message, error.message
+  end
 end

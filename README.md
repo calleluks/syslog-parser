@@ -47,4 +47,7 @@ message.structured_data #=> [#<struct StructuredDataElement
 # id="exampleSDID@32473"@71, params={"iut"=>"3", "eventSource"=>"Application",
 # "eventID"=>"1011"}>]
 message.msg             #=> "An application event log entry..."
+
+parser.parse("malformed") #=> "Syslog::Parser::Error: Failed to match sequence
+# (HEADER SP STRUCTURED_DATA (SP MSG)?) at line 1 char 1."
 ```
