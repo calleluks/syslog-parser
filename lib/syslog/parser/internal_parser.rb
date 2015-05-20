@@ -3,10 +3,22 @@ require "parslet"
 module Syslog
   class Parser
     class InternalParser < Parslet::Parser
+      def initialize(options={})
+        super()
+
+        @allow_missing_structured_data =
+          options.fetch(:allow_missing_structured_data, false)
+      end
+
       root :syslog_msg
 
       rule :syslog_msg do
-        (header >> sp >> structured_data >> (sp >> msg).maybe).as(:syslog_msg)
+        if @allow_missing_structured_data
+          (header >> (sp >> structured_data).maybe >> (sp >> msg).maybe)
+            .as(:syslog_msg)
+        else
+          (header >> sp >> structured_data >> (sp >> msg).maybe).as(:syslog_msg)
+        end
       end
 
       rule :header do

@@ -5,9 +5,9 @@ module Syslog
   class Parser
     class Error < StandardError; end
 
-    def initialize
+    def initialize(options={})
       @transform = Transform.new
-      @parser = InternalParser.new
+      @parser = InternalParser.new(options)
     end
 
     def parse(line)

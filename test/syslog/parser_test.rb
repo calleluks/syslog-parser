@@ -146,4 +146,24 @@ class ParserTest < Minitest::Test
       "at line 1 char 1."
     assert_equal message, error.message
   end
+
+  def test_allow_missing_structured_data
+    parser = Syslog::Parser.new(allow_missing_structured_data: true)
+
+    line = "<40>1 2012-11-30T06:45:29+00:00 host app web.3 - State changed "\
+      "from starting to up"
+    message = parser.parse(line)
+
+    assert_equal 40, message.prival
+    assert_equal 5, message.facility
+    assert_equal 0, message.severity
+    assert_equal 1, message.version
+    assert_equal Time.utc(2012, 11, 30, 6, 45, 29), message.timestamp
+    assert_equal "host", message.hostname
+    assert_equal "app", message.app_name
+    assert_equal "web.3", message.procid
+    assert_equal nil, message.msgid
+    assert_equal nil, message.structured_data
+    assert_equal "State changed from starting to up", message.msg
+  end
 end
