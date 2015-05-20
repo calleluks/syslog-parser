@@ -28,20 +28,23 @@ gem install syslog-parser
 require "syslog/parser"
 
 parser = Syslog::Parser.new
-line = "<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - "\
-  "'su root' failed for lonvick on /dev/pts/8"
+line = '<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 '\
+  [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"] '\
+  'An application event log entry...'
 
 message = parser.parse(line)
 
-message.prival          #=> 34
-message.facility        #=> 4
-message.severity        #=> 2
+message.prival          #=> 165
+message.facility        #=> 20
+message.severity        #=> 5
 message.version         #=> 1
 message.timestamp       #=> 2003-10-11 22:14:15 UTC
 message.timestamp.class #=> Time
 message.hostname        #=> "mymachine.example.com"
-message.app_name        #=> "su"
+message.app_name        #=> "evntslog"
 message.procid          #=> nil
-message.structured_data #=> nil
-message.msg             #=> "'su root' failed for lonvick on /dev/pts/8"
+message.structured_data #=> [#<struct StructuredDataElement
+# id="exampleSDID@32473"@71, params={"iut"=>"3", "eventSource"=>"Application",
+# "eventID"=>"1011"}>]
+message.msg             #=> "An application event log entry..."
 ```

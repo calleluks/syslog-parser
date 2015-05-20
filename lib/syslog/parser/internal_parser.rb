@@ -6,7 +6,7 @@ module Syslog
       root :syslog_msg
 
       rule :syslog_msg do
-        header >> sp >> structured_data >> (sp >> msg).maybe
+        (header >> sp >> structured_data >> (sp >> msg).maybe).as(:syslog_msg)
       end
 
       rule :header do
@@ -100,7 +100,11 @@ module Syslog
       end
 
       rule :sd_element do
-        str("[") >> sd_id >> (sp >> sd_param).repeat >> str("]")
+        str("[") >> sd_id >> sd_params >> str("]")
+      end
+
+      rule :sd_params do
+        (sp >> sd_param).repeat.as(:sd_params)
       end
 
       rule :sd_param do
@@ -108,15 +112,29 @@ module Syslog
       end
 
       rule :sd_id do
-        sd_name
+        sd_name.as(:sd_id)
       end
 
       rule :param_name do
-        sd_name
+        sd_name.as(:param_name)
+      end
+
+      rule :param_value do
+        # characters '"', '\' and ']' MUST be escaped
+        (esc_seq | char).repeat.as(:param_value)
+      end
+
+      rule :esc_seq do
+        str("\\") >> match(/[\]"]/).as(:esq_char)
+      end
+
+      rule :char do
+        match(/[\]"]/).absent? >> any.as(:char)
       end
 
       rule :sd_name do
-        printusascii.reapeat(1, 32) # except '=', sp, ']', '"'
+        # except '=', ' ', ']', '"'
+        (match(/[= \]"]/).absent? >> printusascii).repeat(1, 32)
       end
 
       rule :msg do
