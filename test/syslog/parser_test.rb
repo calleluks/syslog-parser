@@ -166,4 +166,26 @@ class ParserTest < Minitest::Test
     assert_equal nil, message.structured_data
     assert_equal "State changed from starting to up", message.msg
   end
+
+  def test_message_attribute_classes
+    parser = Syslog::Parser.new
+
+    line = '<165>1 2003-10-11T22:14:15.003Z hostname app_name procid msgid '\
+      '[id param_name="param_value"] msg'
+    message = parser.parse(line)
+
+    assert_equal Fixnum, message.prival.class
+    assert_equal Fixnum, message.facility.class
+    assert_equal Fixnum, message.severity.class
+    assert_equal Fixnum, message.version.class
+    assert_equal Time, message.timestamp.class
+    assert_equal String, message.hostname.class
+    assert_equal String, message.app_name.class
+    assert_equal String, message.procid.class
+    assert_equal String, message.msgid.class
+    assert_equal String, message.structured_data[0].id.class
+    assert_equal String, message.structured_data[0].params.keys.first.class
+    assert_equal String, message.structured_data[0].params.values.first.class
+    assert_equal String, message.msg.class
+  end
 end

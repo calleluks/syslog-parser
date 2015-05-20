@@ -17,7 +17,7 @@ module Syslog
               sd_param.fetch(:param_value).join,
           )
         end
-        StructuredDataElement.new(sd_id, params)
+        StructuredDataElement.new(sd_id.to_s, params)
       end
 
       rule syslog_msg: subtree(:syslog_msg) do
@@ -25,12 +25,12 @@ module Syslog
           Integer(syslog_msg[:prival]),
           Integer(syslog_msg[:version]),
           Time.parse(syslog_msg[:timestamp]),
-          syslog_msg[:hostname],
-          syslog_msg[:app_name],
-          syslog_msg[:procid],
-          syslog_msg[:msgid],
-          syslog_msg[:structured_data],
-          syslog_msg[:msg],
+          syslog_msg[:hostname] && syslog_msg[:hostname].to_s,
+          syslog_msg[:app_name] && syslog_msg[:app_name].to_s,
+          syslog_msg[:procid] && syslog_msg[:procid].to_s,
+          syslog_msg[:msgid] && syslog_msg[:msgid].to_s,
+          syslog_msg[:structured_data] && syslog_msg[:structured_data],
+          syslog_msg[:msg] && syslog_msg[:msg].to_s,
         )
       end
     end
